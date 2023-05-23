@@ -1,15 +1,19 @@
 {
-    "name": "application",
-    "version": "1.0.0",
-    "scripts": {
-        "start": "node ./src/server.js",
-        "dev": "nodemon --watch \"./src/**/*.js\" --exec \"npm start\""
-    },
-    "devDependencies": {
-        "nodemon": "^2.0.15"
-    },
-    "dependencies": {
-        "express": "^4.17.3"
-    }
-
+  "name": "mariadb-test",
+  "version": "1.0.0",
+  "description": "mariadb connection testing project",
+  "main": "index.js",
+  "scripts": {
+    "test": "1234",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "dbms_webpage"
+  },
+  "keywords": [
+    "subject"
+  ],
+  "author": "Yuseungbin",
+  "license": "ISC"
 }
