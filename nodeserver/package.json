@@ -15,5 +15,8 @@
     "subject"
   ],
   "author": "Yuseungbin",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "mariadb": "^3.1.2"
+  }
 }
