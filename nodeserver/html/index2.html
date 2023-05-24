@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>게시판</title>
+  <div class="img-holder">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5muKTTN9S02W78yYT6vugq8w6WLbNFbjw4g&usqp=CAU" alt="">
+</div> 
   <style>
     table {
       width: 100%;
@@ -32,26 +35,104 @@
         <th>날짜</th>
       </tr>
     </thead>
-    <tbody>
-      <tr>
-        <td>1</td>
-        <td>첫 번째 글</td>
-        <td>작성자1</td>
-        <td>2023-05-23</td>
-      </tr>
-      <tr>
-        <td>2</td>
-        <td>두 번째 글</td>
-        <td>작성자2</td>
-        <td>2023-05-24</td>
-      </tr>
-      <tr>
-        <td>3</td>
-        <td>세 번째 글</td>
-        <td>작성자3</td>
-        <td>2023-05-25</td>
-      </tr>
-    </tbody>
+    <tbody id="post-table"></tbody>
   </table>
+
+  <div id="pagination">
+    <button id="prev-button" disabled>이전</button>
+    <button id="next-button">다음</button>
+  </div>
+
+  <h2>전체 글</h2>
+  <div id="post-list"></div>
+
+  <script>
+    const pageSize = 7; // 페이지당 표시할 글 수
+    let currentPage = 1; // 현재 페이지 번호
+
+    const postTable = document.getElementById('post-table');
+    const prevButton = document.getElementById('prev-button');
+    const nextButton = document.getElementById('next-button');
+    const postList = document.getElementById('post-list');
+
+    // 서버에서 전체 글 데이터를 가져와서 동적으로 테이블과 리스트를 생성
+    function fetchPosts(page) {
+      // 테이블 데이터 가져오기
+      fetch(`/posts?page=${page}&size=${pageSize}`)
+        .then(response => response.json())
+        .then(data => {
+          const { posts, totalPage } = data;
+          postTable.innerHTML = '';
+
+          posts.forEach(post => {
+            const row = document.createElement('tr');
+            const tableData = document.createElement('td');
+            const link = document.createElement('a');
+            link.href = `/posts/${post.id}`;
+            link.textContent = post.title;
+
+            tableData.textContent = post.id;
+            row.appendChild(tableData);
+            row.appendChild(link);
+
+            tableData = document.createElement('td');
+            tableData.textContent = post.author;
+            row.appendChild(tableData);
+
+            tableData = document.createElement('td');
+            tableData.textContent = post.date;
+            row.appendChild(tableData);
+
+            postTable.appendChild(row);
+          });
+
+          // 페이지네이션 버튼 상태 업데이트
+          prevButton.disabled = page === 1;
+          nextButton.disabled = page === totalPage;
+        })
+        .catch(error => console.error(error));
+
+      // 리스트 데이터 가져오기
+      fetch('/posts')
+        .then(response => response.json())
+        .then(posts => {
+          postList.innerHTML = '';
+
+          const startIndex = (page - 1) * pageSize;
+          const endIndex = startIndex + pageSize;
+          const displayedPosts = posts.slice(startIndex, endIndex);
+
+          displayedPosts.forEach(post => {
+            const listItem = document.createElement('div');
+            listItem.classList.add('post-item');
+
+            const link = document.createElement('a');
+            link.href = `/posts/${post.id}`;
+            link.textContent = post.title;
+            listItem.appendChild(link);
+
+            postList.appendChild(listItem);
+          });
+        })
+        .catch(error => console.error(error));
+    }
+
+    // 이전 페이지로 이동
+    prevButton.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        fetchPosts(currentPage);
+      }
+    });
+
+    // 다음 페이지로 이동
+    nextButton.addEventListener('click', () => {
+      currentPage++;
+      fetchPosts(currentPage);
+    });
+
+    // 초기 페이지 로딩
+    fetchPosts(currentPage);
+  </script>
 </body>
 </html>

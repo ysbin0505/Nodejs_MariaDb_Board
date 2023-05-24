@@ -12,7 +12,7 @@ async function GetUserList(){
     try{
         conn = await pool.getConnection();
         conn.query('USE nodejs_test');
-        rows = await conn.query('SELECT * FROM users');
+        rows = await conn.query('SELECT * FROM tbl_board');
     }
     catch(err){
         throw err;
