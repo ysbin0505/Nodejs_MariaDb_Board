@@ -2,10 +2,35 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>게시판</title>
+  <title>20193072 유승빈 DBMS_Webpage 게시판</title>
+  <style>
+    .img-holder {
+      background-color: #b41616;
+      width: 200px;
+      height: 200px;
+      position: relative;
+      top: 0px;
+      left: 20px;
+      display: flex;  /*유연한 컨테이너로 표현*/
+      align-items: center;  /*수직*/
+      justify-content: center;   /*수평*/
+      overflow: hidden; /*이미지를 액자 내부로 제한*/
+    border: 10px solid #0a0a0a; /*액자의 테두리 스타일과 색상을 지정*/
+    box-shadow: 0 0 10px rgba(154, 136, 136, 0.2); /*액자에 그림자 효과를 추가*/
+    }
+    
+    .img-holder img {
+      width: 95%;
+      height: 95%;
+      object-fit: cover;
+    }
+  </style>
+  
   <div class="img-holder">
     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5muKTTN9S02W78yYT6vugq8w6WLbNFbjw4g&usqp=CAU" alt="">
-</div> 
+  </div>
+  
+   
   <style>
     table {
       width: 100%;
