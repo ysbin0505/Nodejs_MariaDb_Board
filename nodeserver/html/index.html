@@ -43,30 +43,28 @@
       height: 95%;
       object-fit: cover;
     }
-  </style>
 
-  <style>
     table {
       width: 100%;
-      border-collapse: collapse;
+      border-collapse: separate;  /*collapse, separate*/
     }
     th, td {
       padding: 8px;
-      text-align: left;
+      text-align: middle;
       border-bottom: 1px solid #0e0d0d9e;
     }
+
+    th2{
+      text-align: middle;
+    }
+
     th {
-      background-color: #f2f2f2;
+      background-color: #9a7d7d;
     }
     tr:hover {
-      background-color: #f5f5f5;
+      background-color: #220909;
     }
-  </style>
-</head>
 
-
-<body>
-  <style>
     h1 {
       color: #6f2121; /* 제목 텍스트 색상 */
       font-size: 32px; /* 제목 폰트 크기 */
@@ -74,6 +72,10 @@
       /* 추가적인 스타일 속성들을 여기에 추가할 수 있습니다. */
     }
   </style>
+</head>
+
+
+<body>
   <h1>
     *게시판*
   </h1>
@@ -90,6 +92,11 @@
   </table>
 
   <div id="pagination">
+    <button type="button" class="navyBtn" onClick="location.href='write.html'">글 쓰기</button>
+  </div>
+  
+  
+  <div id="pagination" style="display: flex; justify-content: center;">
     <button id="prev-button" disabled>이전</button>
     <button id="next-button">다음</button>
   </div>
@@ -180,6 +187,11 @@
     nextButton.addEventListener('click', () => {
       currentPage++;
       fetchPosts(currentPage);
+    });
+
+    // 글 쓰기 페이지로 이동
+    writeButton.addEventListener('click', () => {
+      window.location.href = '/write'; // 새로운 글 쓰기 페이지의 URL로 이동
     });
 
     // 초기 페이지 로딩

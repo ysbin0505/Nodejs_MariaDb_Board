@@ -3,7 +3,13 @@ const http = require('http');
 const fs = require('fs');
 
 const server = http.createServer(function(request, response) {
-  const filePath = path.join(__dirname, 'html', 'index.html');
+  let filePath;
+
+  if (request.url === '/write.html') {
+    filePath = path.join(__dirname, 'html', 'write.html');
+  } else {
+    filePath = path.join(__dirname, 'html', 'index.html');
+  }
 
   fs.readFile(filePath, 'utf8', function(err, data) {
     if (err) {
@@ -18,5 +24,5 @@ const server = http.createServer(function(request, response) {
 });
 
 server.listen(3000, function() {
-  console.log('Server is running...');
+  console.log('Server 작동 중...');
 });
