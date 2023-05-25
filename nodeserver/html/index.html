@@ -69,8 +69,29 @@
       color: #6f2121; /* 제목 텍스트 색상 */
       font-size: 32px; /* 제목 폰트 크기 */
       text-align: left; /* 제목 정렬 */
-      /* 추가적인 스타일 속성들을 여기에 추가할 수 있습니다. */
+      margin-left: 20px;
     }
+
+    h2 {
+      margin-left: 20px;
+    }
+
+    button[type="button"] {
+      display: block;
+      margin-top: 20px;
+      margin-left: 10px;
+      padding: 10px 20px;
+      background-color: #bd7272;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button[type="button"]:hover {
+      background-color: #9a4040;
+    }
+
   </style>
 </head>
 
@@ -107,6 +128,7 @@
   <script>
     const pageSize = 5; // 페이지당 표시할 글 수
     let currentPage = 1; // 현재 페이지 번호
+    let totalPage = 0; // 전체 페이지 수
 
     const postTable = document.getElementById('post-table');
     const prevButton = document.getElementById('prev-button');
@@ -119,7 +141,7 @@
       fetch(`/posts?page=${page}&size=${pageSize}`)
         .then(response => response.json())
         .then(data => {
-          const { posts, totalPage } = data;
+          const { posts, totalPage: totalPages } = data;
           postTable.innerHTML = '';
 
           posts.forEach(post => {
@@ -131,49 +153,43 @@
 
             tableData.textContent = post.id;
             row.appendChild(tableData);
-            row.appendChild(link);
+            tableData.appendChild(link);
 
-            tableData = document.createElement('td');
-            tableData.textContent = post.author;
-            row.appendChild(tableData);
+            const authorData = document.createElement('td');
+            authorData.textContent = post.author;
+            row.appendChild(authorData);
 
-            tableData = document.createElement('td');
-            tableData.textContent = post.date;
-            row.appendChild(tableData);
+            const dateData = document.createElement('td');
+            dateData.textContent = post.date;
+            row.appendChild(dateData);
 
             postTable.appendChild(row);
           });
 
-          // 페이지네이션 버튼 상태 업데이트
-          prevButton.disabled = page === 1;
-          nextButton.disabled = page === totalPage;
-        })
-        .catch(error => console.error(error));
+          totalPage = totalPages;
 
-      // 리스트 데이터 가져오기
-      fetch('/posts')
-        .then(response => response.json())
-        .then(posts => {
-          postList.innerHTML = '';
+          // 현재 페이지가 첫 페이지인 경우 이전 버튼을 비활성화
+          if (currentPage === 1) {
+            prevButton.disabled = true;
+          } else {
+            prevButton.disabled = false;
+          }
 
-          const startIndex = (page - 1) * pageSize;
-          const endIndex = startIndex + pageSize;
-          const displayedPosts = posts.slice(startIndex, endIndex);
+          // 현재 페이지가 마지막 페이지인 경우 다음 버튼을 비활성화
+          if (currentPage === totalPage) {
+            nextButton.disabled = true;
+          } else {
+            nextButton.disabled = false;
+          }
 
-          displayedPosts.forEach(post => {
-            const listItem = document.createElement('div');
-            listItem.classList.add('post-item');
-
-            const link = document.createElement('a');
-            link.href = `/posts/${post.id}`;
-            link.textContent = post.title;
-            listItem.appendChild(link);
-
-            postList.appendChild(listItem);
-          });
+          // 현재 페이지 번호와 전체 페이지 수를 표시
+          postList.textContent = `페이지: ${currentPage} / ${totalPage}`;
         })
         .catch(error => console.error(error));
     }
+
+    // 초기 페이지 로드 시 첫 페이지의 데이터를 가져옴
+    fetchPosts(currentPage);
 
     // 이전 페이지로 이동
     prevButton.addEventListener('click', () => {
@@ -185,17 +201,13 @@
 
     // 다음 페이지로 이동
     nextButton.addEventListener('click', () => {
-      currentPage++;
-      fetchPosts(currentPage);
+      if (currentPage < totalPage) {
+        currentPage++;
+        fetchPosts(currentPage);
+      } else {
+        alert('다음 페이지가 없습니다.');
+      }
     });
-
-    // 글 쓰기 페이지로 이동
-    writeButton.addEventListener('click', () => {
-      window.location.href = '/write'; // 새로운 글 쓰기 페이지의 URL로 이동
-    });
-
-    // 초기 페이지 로딩
-    fetchPosts(currentPage);
   </script>
 </body>
 </html>

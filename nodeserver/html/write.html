@@ -44,12 +44,29 @@
       background-color: #6f2121;
       color: #fff;
       border: none;
-      border-radius: 4px;
+      border-radius: 5px;
       font-size: 16px;
       cursor: pointer;
     }
     button[type="submit"]:hover {
       background-color: #9a4040;
+    }
+    button[type="button"] {
+      display: block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #6f2121;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button[type="button"]:hover {
+      background-color: #9a4040;
+    }
+    .space {
+      width: 10px; /*버튼 사이 간격 조절*/
     }
   </style>
 </head>
@@ -63,8 +80,31 @@
       <label for="content">내용</label>
       <textarea id="content" name="content" required></textarea>
 
-      <button type="submit">글 작성 완료</button>
+      <div style="display: flex; justify-content: center;">
+        <div>
+          <button type="submit" class="navyBtn" onclick="submitForm()">글 작성 완료</button>
+        </div>
+        <div class="space"></div>
+        <div>
+          <button type="button" class="navyBtn" onclick="location.href = 'index.html'">취소</button>
+        </div>
+      </div>
     </form>
   </div>
+
+  <script>
+    function submitForm() {
+      const title = document.getElementById('title').value;
+      const content = document.getElementById('content').value;
+
+      if (title.trim() !== '' && content.trim() !== '') {
+        // 제목과 내용 모두 입력된 경우, index.html로 이동
+        location.href = 'index.html';
+      } else {
+        // 제목 또는 내용이 비어있는 경우, 경고창 표시 후 폼 제출 취소
+        alert('제목과 내용을 입력해주세요.');
+      }
+    }
+  </script>
 </body>
 </html>
