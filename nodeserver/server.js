@@ -6,9 +6,9 @@ const server = http.createServer(function(request, response) {
   let filePath;
 
   if (request.url === '/write.html') {
-    filePath = path.join(__dirname, 'html', 'write.html');
+    filePath = path.join(__dirname,'write.html');
   } else {
-    filePath = path.join(__dirname, 'html', 'index.html');
+    filePath = path.join(__dirname,'index.html');
   }
 
   fs.readFile(filePath, 'utf8', function(err, data) {

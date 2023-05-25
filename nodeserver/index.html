@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>20193072 유승빈 DBMS_Webpage 게시판</title>
+
+  <div class="img-holder">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5muKTTN9S02W78yYT6vugq8w6WLbNFbjw4g&usqp=CAU" alt="">
+  </div>
+
+  <style>
+    /* HTML 요소에 적용되는 스타일을 정의하는 데 사용되는 속성(attribute) */
+    body {
+      /* 전체 페이지의 기본 스타일을 설정 */
+      font-family: Arial, sans-serif;
+      background-color: #f9f6f6;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      /* 페이지 내용의 최대 너비와 중앙 정렬을 설정 */
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .img-holder {
+      /* 이미지 */
+      background-color: #b41616; /* 95% 사진 빼고 남은 5%부분 */
+      width: 200px;
+      height: 200px;
+      position: relative;
+      top: 0px; /* 높이 맞추기 */
+      left: 650px; /* 가운데 맞추기 */
+      display: flex; /* 유연한 컨테이너로 표현 */
+      align-items: center; /* 수직 */
+      justify-content: center; /* 수평 */
+      overflow: hidden; /* 이미지를 액자 내부로 제한 */
+      border: 5px solid #0a0a0a; /* 액자의 테두리 스타일과 색상을 지정 */
+      box-shadow: 0 0 10px rgba(154, 136, 136, 0.2); /* 액자에 그림자 효과를 추가 */
+    }
+
+    .img-holder img {
+      /* 액자부분 */
+      width: 95%;
+      height: 95%;
+      object-fit: cover;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate; /* collapse, separate */
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: middle;
+      border-bottom: 1px solid #0e0d0d9e;
+    }
+
+    th2 {
+      text-align: middle;
+    }
+
+    th {
+      background-color: #9a7d7d;
+    }
+
+    tr:hover {
+      background-color: #220909;
+    }
+
+    h1 {
+      color: #6f2121; /* 제목 텍스트 색상 */
+      font-size: 32px; /* 제목 폰트 크기 */
+      text-align: left; /* 제목 정렬 */
+      margin-left: 20px;
+    }
+
+    h2 {
+      margin-left: 20px;
+    }
+
+    button[type="button"] {
+      display: block;
+      margin-top: 20px;
+      margin-left: 10px;
+      padding: 10px 20px;
+      background-color: #bd7272;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button[type="button"]:hover {
+      background-color: #9a4040;
+    }
+  </style>
+</head>
+
+<body>
+<h1>
+  *게시판*
+</h1>
+<table>
+  <thead>
+  <tr>
+    <th>번호</th>
+    <th>제목</th>
+    <th>작성자</th>
+    <th>날짜</th>
+  </tr>
+  </thead>
+  <tbody id="post-table"></tbody>
+</table>
+
+<div id="pagination">
+  <button type="button" class="navyBtn" onClick="location.href='write.html'">글 쓰기</button>
+</div>
+
+
+<div id="pagination" style="display: flex; justify-content: center;">
+  <button id="prev-button" disabled>이전</button>
+  <button id="next-button">다음</button>
+</div>
+
+<h2>전체 글</h2>
+<div id="post-list"></div>
+
+<script>
+  const pageSize = 5; // 페이지당 표시할 글 수
+  let currentPage = 1; // 현재 페이지 번호
+  let totalPage = 0; // 전체 페이지 수
+
+  const postTable = document.getElementById('post-table');
+  const prevButton = document.getElementById('prev-button');
+  const nextButton = document.getElementById('next-button');
+  const postList = document.getElementById('post-list');
+
+  // 서버에서 전체 글 데이터를 가져와서 동적으로 테이블과 리스트를 생성
+  function fetchPosts(page) {
+    // 테이블 데이터 가져오기
+    fetch(`/posts?page=${page}&size=${pageSize}`)
+      .then(response => response.json())
+      .then(data => {
+        const { posts, totalPage: totalPages } = data;
+        postTable.innerHTML = '';
+
+        posts.forEach(post => {
+          const row = document.createElement('tr');
+
+          const idData = document.createElement('td');
+          idData.textContent = post.id;
+          row.appendChild(idData);
+
+          const titleData = document.createElement('td');
+          const link = document.createElement('a');
+          link.href = `/posts/${post.id}`;
+          link.textContent = post.title;
+          titleData.appendChild(link);
+          row.appendChild(titleData);
+
+          const authorData = document.createElement('td');
+          authorData.textContent = post.author;
+          row.appendChild(authorData);
+
+          const dateData = document.createElement('td');
+          dateData.textContent = post.date;
+          row.appendChild(dateData);
+
+          postTable.appendChild(row);
+        });
+
+        totalPage = totalPages;
+
+        // 현재 페이지가 첫 페이지인 경우 이전 버튼을 비활성화
+        if (currentPage === 1) {
+          prevButton.disabled = true;
+        } else {
+          prevButton.disabled = false;
+        }
+
+        // 현재 페이지가 마지막 페이지인 경우 다음 버튼을 비활성화
+        if (currentPage === totalPage) {
+          nextButton.disabled = true;
+        } else {
+          nextButton.disabled = false;
+        }
+
+        // 현재 페이지 번호와 전체 페이지 수를 표시
+        postList.textContent = `페이지: ${currentPage} / ${totalPage}`;
+      })
+      .catch(error => console.error(error));
+  }
+
+  // 초기 페이지 로드 시 첫 페이지의 데이터를 가져옴
+  fetchPosts(currentPage);
+
+  // 이전 페이지로 이동
+  prevButton.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      fetchPosts(currentPage);
+    }
+  });
+
+  // 다음 페이지로 이동
+  nextButton.addEventListener('click', () => {
+    if (currentPage < totalPage) {
+      currentPage++;
+      fetchPosts(currentPage);
+    } else {
+      alert('다음 페이지가 없습니다.');
+    }
+  });
+</script>
+</body>
+</html>
