@@ -37,7 +37,7 @@
     textarea {
       height: 150px;
     }
-    button[type="submit"] {
+    .navyBtn {
       display: block;
       margin-top: 20px;
       padding: 10px 20px;
@@ -48,21 +48,7 @@
       font-size: 16px;
       cursor: pointer;
     }
-    button[type="submit"]:hover {
-      background-color: #9a4040;
-    }
-    button[type="button"] {
-      display: block;
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #6f2121;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    button[type="button"]:hover {
+    .navyBtn:hover {
       background-color: #9a4040;
     }
     .space {
@@ -92,6 +78,9 @@
 
       <label for="content">내용</label>
       <textarea id="content" name="content" required></textarea>
+
+      <label for="writer">작성자</label>
+      <input type="text" id="writer" name="writer" required>
 
       <div style="display: flex; justify-content: center;">
         <div>

@@ -21,36 +21,37 @@ const pool = mariadb.createPool({
   connectionLimit: connectionLimit
 });
 
-// body-parser 미들웨어 사용
+// body-parser middleware
 app.use(express.urlencoded({ extended: true }));
 
 app.post('/add', async (req, res) => {
-    const title = req.body.title;
-    const content = req.body.content;
-  
-    let conn;
-    try {
-      conn = await pool.getConnection();
-      await conn.query('USE nodejs_test');
-      await conn.query('INSERT INTO tbl_board (title, content) VALUES (?, ?)', [title, content]);
-      res.send('글 작성이 완료되었습니다.');
-    } catch (err) {
-      res.status(500).send('글 작성 중 오류가 발생했습니다.');
-    } finally {
-      if (conn) conn.end();
-    }
-  });
+  const title = req.body.title;
+  const content = req.body.content;
+  const writer = req.body.writer;
 
-  app.get('/index.html', (req, res) => {
-    const filePath = path.join(__dirname, 'index.html');
-    fs.readFile(filePath, 'utf8', function (err, data) {
-      if (err) {
-        res.status(500).send('Internal Server Error');
-        return;
-      }
-      res.send(data);
-    });
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    await conn.query('USE nodejs_test');
+    await conn.query('INSERT INTO tbl_board (title, content, writer) VALUES (?, ?, ?)', [title, content, writer]);
+    res.redirect('/index.html'); // Redirect to index.html
+  } catch (err) {
+    res.status(500).send('글 작성 중 오류가 발생했습니다.');
+  } finally {
+    if (conn) conn.end();
+  }
+});
+
+app.get('/index.html', (req, res) => {
+  const filePath = path.join(__dirname, 'index.html');
+  fs.readFile(filePath, 'utf8', function (err, data) {
+    if (err) {
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+    res.send(data);
   });
+});
 
 pool.getConnection()
   .then(conn => {
