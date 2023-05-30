@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>게시물 내용</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .container {
+        /* 페이지 내용의 최대 너비와 중앙 정렬을 설정 */
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 24px;
+        text-align: center;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #f5f5f5;
+      }
+
+      a {
+        color: #337ab7;
+        text-decoration: none;
+      }
+
+      button {
+        padding: 10px 20px;
+        background-color: #337ab7;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+      }
+
+      .navyBtn {
+        background-color: navy;
+      }
+
+      #pagination {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
+
+      #prev-button,
+      #next-button {
+        margin: 0 10px;
+      }
+
+      #prev-button[disabled],
+      #next-button[disabled] {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      #post-list {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>게시물 내용</h1>
+    <div class="post-content" id="post-content">
+      <!-- 게시물 내용이 여기에 표시될 예정입니다 -->
+    </div>
+
+    <div style="display: flex; justify-content: center;">
+      <button type="button" class="navyBtn" onclick="location.href = 'index.html'">돌아가기</button>
+    </div>
+
+    <script>
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const postId = urlParams.get('id');
+      const postContent = document.getElementById('post-content');
+
+      fetch(`/posts/${postId}`)
+        .then(response => response.json())
+        .then(data => {
+          const html = `
+            <div class="container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>번호</th>
+                    <th>제목</th>
+                    <th>내용</th>
+                    <th>작성자</th>
+                    <th>날짜</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>${data.num}</td>
+                    <td>${data.title}</td>
+                    <td>${data.content}</td>
+                    <td>${data.writer}</td>
+                    <td>${data.date}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          `;
+          postContent.innerHTML = html;
+        })
+        .catch(error => {
+          console.error('게시물 내용을 가져오는 중 오류 발생:', error);
+        });
+    </script>
+  </body>
+</html>
