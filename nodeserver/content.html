@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="UTF-8">
     <title>게시물 내용</title>
     <style>
@@ -73,19 +73,38 @@
         margin-top: 20px;
       }
     </style>
-  </head>
-  <body>
-    <h1>게시물 내용</h1>
-    <div class="post-content" id="post-content">
-      <p><strong>번호:</strong> <%= num %></p>
-      <p><strong>제목:</strong> <%= title %></p>
-      <p><strong>내용:</strong> <%= content %></p>
-      <p><strong>작성자:</strong> <%= writer %></p>
-      <p><strong>날짜:</strong> <%= date %></p>
-    </div>
+</head>
+<body>
+  <h1>게시물 내용</h1>
+  <div class="post-content" id="post-content">
+    <p><strong>번호:</strong> <span id="post-num"></span></p>
+    <p><strong>제목:</strong> <span id="post-title"></span></p>
+    <p><strong>내용:</strong> <span id="post-content"></span></p>
+    <p><strong>작성자:</strong> <span id="post-writer"></span></p>
+    <p><strong>날짜:</strong> <span id="post-date"></span></p>
+  </div>
 
-    <div style="display: flex; justify-content: center;">
-      <button type="button" class="navyBtn" onclick="location.href = '/index.html'">돌아가기</button>
-    </div>
-  </body>
+  <div style="display: flex; justify-content: center;">
+    <button type="button" class="navyBtn" onclick="location.href = '/index.html'">돌아가기</button>
+  </div>
+
+  <script>
+    const postId = new URLSearchParams(window.location.search).get('id');
+
+    fetch(`/content/${postId}`)
+      .then(response => response.json())
+      .then(data => {
+        const post = data.post;
+        document.getElementById('post-num').textContent = post.num;
+        document.getElementById('post-title').textContent = post.title;
+        document.getElementById('post-content').textContent = post.content;
+        document.getElementById('post-writer').textContent = post.writer;
+        document.getElementById('post-date').textContent = new Date(post.date).toLocaleDateString();
+      })
+      .catch(error => {
+        console.error('게시물 가져오기 오류:', error);
+        // 오류 처리 로직 추가
+      });
+  </script>
+</body>
 </html>

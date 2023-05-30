@@ -6,68 +6,88 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #e1dcdc;
+      background-color: #f2f2f2;
       margin: 0;
       padding: 0;
     }
+
     .container {
-      max-width: 800px;
+      max-width: 600px;
       margin: 0 auto;
       padding: 20px;
+      background-color: #ffffff;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
+
     h1 {
-      color: #cc4545;
-      font-size: 32px;
       text-align: center;
+      margin-top: 0;
+      color: #333333;
+      font-size: 24px;
+      margin-bottom: 20px;
     }
+
     form {
       margin-top: 20px;
     }
+
     label {
       display: block;
-      margin-bottom: 10px;
-    }
-    input[type="text"], textarea {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-    textarea {
-      height: 150px;
-    }
-    .navyBtn {
-      display: block;
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #6f2121;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .navyBtn:hover {
-      background-color: #9a4040;
-    }
-    .space {
-      width: 10px;  /*버튼 사이 간격 조절*/
-    }
-    .post-container {
-      background-color: #fff;
-      padding: 20px;
-      margin-top: 20px;
-    }
-    .post-title {
-      font-size: 20px;
       font-weight: bold;
       margin-bottom: 10px;
-    }
-    .post-content {
+      color: #333333;
       font-size: 16px;
     }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
+      resize: vertical;
+      color: #333333;
+      font-size: 14px;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      border-color: #001f4d;
+    }
+
+    textarea {
+      height: 150px;
+      background-color: #f9f9f9;
+    }
+
+    .navyBtn {
+      background-color: navy;
+      color: #ffffff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      text-transform: uppercase;
+      transition: background-color 0.3s ease;
+    }
+
+    .navyBtn:hover {
+      background-color: #001f4d;
+    }
+
+    .space {
+      width: 10px;
+    }
+
+    .btn-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
   </style>
+
 </head>
 <body>
   <div class="container">

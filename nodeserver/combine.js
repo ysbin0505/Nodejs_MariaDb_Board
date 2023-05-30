@@ -53,7 +53,7 @@ app.get('/index.html', async (req, res) => {
     conn = await pool.getConnection();
     await conn.query('USE nodejs_test');
     const results = await conn.query('SELECT num, title, writer, date FROM tbl_board');
-    const html = renderIndexPage(results);
+    const html = renderIndexTable(results);
     res.send(html);
   } catch (err) {
     res.status(500).send('내부 서버 오류');
@@ -62,15 +62,15 @@ app.get('/index.html', async (req, res) => {
   }
 });
 
-function renderIndexTable(posts) {   //index.html
+function renderIndexTable(posts) {
   let tableRows = '';
   posts.forEach(post => {
     tableRows += `
       <tr>
         <td>${post.num}</td>
-        <td><a href="/posts/${post.num}">${post.title}</a></td>
+        <td><a href="/post/${post.num}">${post.title}</a></td>
         <td>${post.writer}</td>
-        <td>${post.date}</td>
+        <td>${new Date(post.date).toLocaleDateString()}</td>
       </tr>
     `;
   });
@@ -80,36 +80,61 @@ function renderIndexTable(posts) {   //index.html
 }
 
 
-app.get('/content.html', async (req, res) => {
+app.get('/posts/:id', async (req, res) => {
+  const postId = req.params.id;
+
   let conn;
   try {
     conn = await pool.getConnection();
     await conn.query('USE nodejs_test');
-    const results2 = await conn.query('SELECT num, title, content, writer, date FROM tbl_board');
-    const html = renderIndexPage2(results2);
+    const results = await conn.query('SELECT num, title, content, writer, date FROM tbl_board WHERE num = ?', [postId]);
+
+    if (results.length === 0) {
+      res.status(404).send('게시글을 찾을 수 없습니다.');
+      return;
+    }
+
+    const post = results[0];
+
+    const html = renderContentPage(post);
     res.send(html);
+
   } catch (err) {
+    console.error('게시물 가져오기 오류:', err);
     res.status(500).send('내부 서버 오류');
   } finally {
     if (conn) conn.end();
   }
 });
 
-function renderContentTable(posts) {   //content.html
-  let tableRows = '';
-  posts.forEach(post => {
-    tableRows += `
-      <tr>
-        <td>${post.num}</td>
-        <td><a href="/posts/${post.num}">${post.title}</a></td>
-        <td>${post.writer}</td>
-        <td>${post.date}</td>
-      </tr>
-    `;
-  });
+function renderContentPage(post) {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>${post.title}</title>
+        <style>
+          /* 스타일 코드 */
+        </style>
+      </head>
+      <body>
+        <h1>게시물 내용</h1>
+        <div class="post-content" id="post-content">
+          <p><strong>번호:</strong> ${post.num}</p>
+          <p><strong>제목:</strong> ${post.title}</p>
+          <p><strong>내용:</strong> ${post.content}</p>
+          <p><strong>작성자:</strong> ${post.writer}</p>
+          <p><strong>날짜:</strong> ${new Date(post.date).toLocaleDateString()}</p>
+        </div>
 
-  const html = fs.readFileSync(path.join(__dirname, 'content.html'), 'utf8');
-  return html.replace('<!-- 동적으로 생성된 테이블 행 -->', tableRows);
+        <div style="display: flex; justify-content: center;">
+          <button type="button" class="navyBtn" onclick="location.href = '/index.html'">돌아가기</button>
+        </div>
+      </body>
+    </html>
+  `;
+  return html;
 }
 
 
@@ -128,12 +153,40 @@ app.get('/write.html', (req, res) => {
   const filePath = path.join(__dirname, 'write.html');
   fs.readFile(filePath, 'utf8', function (err, data) {
     if (err) {
-      res.status(500).send('Internal Server E rror');
+      res.status(500).send('Internal Server Error');
       return;
     }
     res.send(data);
   });
 });
+
+// 게시물 API 엔드포인트
+app.get('/content/:id', async (req, res) => {
+  const postId = req.params.id;
+
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    await conn.query('USE nodejs_test');
+    const results = await conn.query('SELECT num, title, content, writer, date FROM tbl_board WHERE num = ?', [postId]);
+
+    if (results.length === 0) {
+      res.status(404).send('게시글을 찾을 수 없습니다.');
+      return;
+    }
+
+    const post = results[0];
+
+    res.json({ post }); // JSON 형식으로 게시물 데이터 응답
+
+  } catch (err) {
+    console.error('게시물 가져오기 오류:', err);
+    res.status(500).send('내부 서버 오류');
+  } finally {
+    if (conn) conn.end();
+  }
+});
+
 
 app.get('/content.html', (req, res) => {
   const filePath = path.join(__dirname, 'content.html');
@@ -144,6 +197,12 @@ app.get('/content.html', (req, res) => {
     }
     res.send(data);
   });
+});
+
+
+app.get('/post/:id', async (req, res) => {
+  const postId = req.params.id;
+  res.redirect(`/content.html?id=${postId}`);
 });
 
 server.listen(serverPort, () => {
