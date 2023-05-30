@@ -62,7 +62,7 @@ app.get('/index.html', async (req, res) => {
   }
 });
 
-function renderIndexTable(posts) {
+function renderIndexTable(posts, currentPage, totalPages) {
   let tableRows = '';
   posts.forEach(post => {
     tableRows += `
@@ -76,36 +76,55 @@ function renderIndexTable(posts) {
   });
 
   const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
-  return html.replace('<!-- 동적으로 생성된 테이블 행 -->', tableRows);
+  const pagination = renderPagination(currentPage, totalPages);
+  return html.replace('<!-- 동적으로 생성된 테이블 행 -->', tableRows).replace('<!-- 페이징 -->', pagination);
+}
+
+function renderPagination(currentPage, totalPages) {
+  let paginationHTML = '';
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === currentPage) {
+      paginationHTML += `<span>${i}</span>`;
+    } else {
+      paginationHTML += `<a href="/index.html?page=${i}">${i}</a>`;
+    }
+  }
+
+  return paginationHTML;
 }
 
 
-app.get('/posts/:id', async (req, res) => {
-  const postId = req.params.id;
+app.get('/index.html', async (req, res) => {
+  const page = parseInt(req.query.page) || 1; // 현재 페이지
+  const perPage = 10; // 페이지당 게시물 수
 
   let conn;
   try {
     conn = await pool.getConnection();
     await conn.query('USE nodejs_test');
-    const results = await conn.query('SELECT num, title, content, writer, date FROM tbl_board WHERE num = ?', [postId]);
 
-    if (results.length === 0) {
-      res.status(404).send('게시글을 찾을 수 없습니다.');
-      return;
-    }
+    // 전체 게시물 수 조회
+    const totalCountResult = await conn.query('SELECT COUNT(*) AS total FROM tbl_board');
+    const totalCount = totalCountResult[0].total;
 
-    const post = results[0];
+    // 총 페이지 수 계산
+    const totalPages = Math.ceil(totalCount / perPage);
 
-    const html = renderContentPage(post);
+    // 현재 페이지에 해당하는 게시물 조회
+    const offset = (page - 1) * perPage;
+    const results = await conn.query('SELECT num, title, writer, date FROM tbl_board LIMIT ?, ?', [offset, perPage]);
+
+    const html = renderIndexTable(results, page, totalPages);
     res.send(html);
-
   } catch (err) {
-    console.error('게시물 가져오기 오류:', err);
+    console.error('내부 서버 오류:', err);
     res.status(500).send('내부 서버 오류');
   } finally {
     if (conn) conn.end();
   }
 });
+
+
 
 function renderContentPage(post) {
   const html = `
@@ -204,6 +223,26 @@ app.get('/post/:id', async (req, res) => {
   const postId = req.params.id;
   res.redirect(`/content.html?id=${postId}`);
 });
+
+app.delete('/delete/:id', async (req, res) => {
+  const postId = req.params.id;
+
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    await conn.query('USE nodejs_test');
+    await conn.query('DELETE FROM tbl_board WHERE num = ?', [postId]);
+
+    res.json({ message: '게시물이 삭제되었습니다.' });
+
+  } catch (err) {
+    console.error('게시물 삭제 오류:', err);
+    res.status(500).json({ error: '게시물 삭제 중 오류가 발생했습니다.' });
+  } finally {
+    if (conn) conn.end();
+  }
+});
+
 
 server.listen(serverPort, () => {
   console.log('Server 작동 중...');

@@ -4,74 +4,7 @@
     <meta charset="UTF-8">
     <title>게시물 내용</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-      }
-
-      .container {
-        /* 페이지 내용의 최대 너비와 중앙 정렬을 설정 */
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-
-      h1 {
-        font-size: 24px;
-        text-align: center;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      th, td {
-        padding: 10px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-      }
-
-      th {
-        background-color: #f5f5f5;
-      }
-
-      a {
-        color: #337ab7;
-        text-decoration: none;
-      }
-
-      button {
-        padding: 10px 20px;
-        background-color: #337ab7;
-        color: #fff;
-        border: none;
-        cursor: pointer;
-      }
-
-      .navyBtn {
-        background-color: navy;
-      }
-
-      #pagination {
-        margin-top: 20px;
-        display: flex;
-        justify-content: center;
-      }
-
-      #prev-button, #next-button {
-        margin: 0 10px;
-      }
-
-      #prev-button[disabled], #next-button[disabled] {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-
-      #post-list {
-        margin-top: 20px;
-      }
+     
     </style>
 </head>
 <body>
@@ -79,13 +12,14 @@
   <div class="post-content" id="post-content">
     <p><strong>번호:</strong> <span id="post-num"></span></p>
     <p><strong>제목:</strong> <span id="post-title"></span></p>
-    <p><strong>내용:</strong> <span id="post-content"></span></p>
+    <p><strong>내용:</strong> <span id="post-content-text"></span></p>
     <p><strong>작성자:</strong> <span id="post-writer"></span></p>
     <p><strong>날짜:</strong> <span id="post-date"></span></p>
   </div>
 
   <div style="display: flex; justify-content: center;">
     <button type="button" class="navyBtn" onclick="location.href = '/index.html'">돌아가기</button>
+    <button type="button" class="navyBtn" onclick="deletePost()">삭제</button>
   </div>
 
   <script>
@@ -97,7 +31,7 @@
         const post = data.post;
         document.getElementById('post-num').textContent = post.num;
         document.getElementById('post-title').textContent = post.title;
-        document.getElementById('post-content').textContent = post.content;
+        document.getElementById('post-content-text').textContent = post.content;
         document.getElementById('post-writer').textContent = post.writer;
         document.getElementById('post-date').textContent = new Date(post.date).toLocaleDateString();
       })
@@ -105,6 +39,21 @@
         console.error('게시물 가져오기 오류:', error);
         // 오류 처리 로직 추가
       });
+
+    function deletePost() {
+      // 삭제 로직 구현
+      fetch(`/delete/${postId}`, { method: 'DELETE' })
+        .then(response => response.json())
+        .then(data => {
+          // 삭제 성공 시 처리 로직
+          alert('게시물이 삭제되었습니다.');
+          window.location.href = '/index.html'; // 삭제 후 목록 페이지로 이동
+        })
+        .catch(error => {
+          console.error('게시물 삭제 오류:', error);
+          // 오류 처리 로직 추가
+        });
+    }
   </script>
 </body>
 </html>
