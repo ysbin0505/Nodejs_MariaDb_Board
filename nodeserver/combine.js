@@ -52,7 +52,7 @@ app.get('/index.html', async (req, res) => {
   try {
     conn = await pool.getConnection();
     await conn.query('USE nodejs_test');
-    const results = await conn.query('SELECT num, title, content, writer, date FROM tbl_board');
+    const results = await conn.query('SELECT num, title, writer, date FROM tbl_board');
     const html = renderIndexPage(results);
     res.send(html);
   } catch (err) {
@@ -62,44 +62,7 @@ app.get('/index.html', async (req, res) => {
   }
 });
 
-app.get('/content', async (req, res) => {
-  let conn;
-  try {
-    conn = await pool.getConnection();
-    await conn.query('USE nodejs_test');
-    const results = await conn.query('SELECT num, title, writer, date FROM tbl_board');
-    const html = renderIndexPage2(results);
-    res.send(html);
-  } catch (err) {
-    res.status(500).send('내부 서버 오류');
-  } finally {
-    if (conn) conn.end();
-  }
-});
-
-// 새로 추가된 라우트 핸들러 시작
-app.get('/posts/:postId', async (req, res) => {
-  const postId = req.params.postId;
-  let conn;
-  try {
-    conn = await pool.getConnection();
-    await conn.query('USE nodejs_test');
-    const results = await conn.query('SELECT num, title, content, writer, date FROM tbl_board WHERE num = ?', [postId]);
-    if (results.length === 0) {
-      res.status(404).send('게시물을 찾을 수 없습니다.');
-    } else {
-      const post = results[0];
-      res.json(post);
-    }
-  } catch (err) {
-    res.status(500).send('내부 서버 오류');
-  } finally {
-    if (conn) conn.end();
-  }
-});
-// 새로 추가된 라우트 핸들러 끝
-
-function renderIndexPage(posts) {
+function renderIndexTable(posts) {   //index.html
   let tableRows = '';
   posts.forEach(post => {
     tableRows += `
@@ -116,14 +79,29 @@ function renderIndexPage(posts) {
   return html.replace('<!-- 동적으로 생성된 테이블 행 -->', tableRows);
 }
 
-function renderIndexPage2(posts) {
+
+app.get('/content.html', async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    await conn.query('USE nodejs_test');
+    const results2 = await conn.query('SELECT num, title, content, writer, date FROM tbl_board');
+    const html = renderIndexPage2(results2);
+    res.send(html);
+  } catch (err) {
+    res.status(500).send('내부 서버 오류');
+  } finally {
+    if (conn) conn.end();
+  }
+});
+
+function renderContentTable(posts) {   //content.html
   let tableRows = '';
   posts.forEach(post => {
     tableRows += `
       <tr>
         <td>${post.num}</td>
         <td><a href="/posts/${post.num}">${post.title}</a></td>
-        <td>${post.content}</td>
         <td>${post.writer}</td>
         <td>${post.date}</td>
       </tr>
@@ -133,6 +111,7 @@ function renderIndexPage2(posts) {
   const html = fs.readFileSync(path.join(__dirname, 'content.html'), 'utf8');
   return html.replace('<!-- 동적으로 생성된 테이블 행 -->', tableRows);
 }
+
 
 pool.getConnection()
   .then(conn => {
@@ -149,7 +128,7 @@ app.get('/write.html', (req, res) => {
   const filePath = path.join(__dirname, 'write.html');
   fs.readFile(filePath, 'utf8', function (err, data) {
     if (err) {
-      res.status(500).send('Internal Server Error');
+      res.status(500).send('Internal Server E rror');
       return;
     }
     res.send(data);

@@ -60,13 +60,11 @@
         justify-content: center;
       }
 
-      #prev-button,
-      #next-button {
+      #prev-button, #next-button {
         margin: 0 10px;
       }
 
-      #prev-button[disabled],
-      #next-button[disabled] {
+      #prev-button[disabled], #next-button[disabled] {
         opacity: 0.5;
         cursor: not-allowed;
       }
@@ -79,51 +77,15 @@
   <body>
     <h1>게시물 내용</h1>
     <div class="post-content" id="post-content">
-      <!-- 게시물 내용이 여기에 표시될 예정입니다 -->
+      <p><strong>번호:</strong> <%= num %></p>
+      <p><strong>제목:</strong> <%= title %></p>
+      <p><strong>내용:</strong> <%= content %></p>
+      <p><strong>작성자:</strong> <%= writer %></p>
+      <p><strong>날짜:</strong> <%= date %></p>
     </div>
 
     <div style="display: flex; justify-content: center;">
-      <button type="button" class="navyBtn" onclick="location.href = 'index.html'">돌아가기</button>
+      <button type="button" class="navyBtn" onclick="location.href = '/index.html'">돌아가기</button>
     </div>
-
-    <script>
-      const queryString = window.location.search;
-      const urlParams = new URLSearchParams(queryString);
-      const postId = urlParams.get('postId');
-      const postContent = document.getElementById('post-content');
-
-      fetch(`/posts/${postId}`)
-        .then(response => response.json())
-        .then(data => {
-          const html = `
-            <div class="container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>번호</th>
-                    <th>제목</th>
-                    <th>내용</th>
-                    <th>작성자</th>
-                    <th>날짜</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>${data.num}</td>
-                    <td>${data.title}</td>
-                    <td>${data.content}</td>
-                    <td>${data.writer}</td>
-                    <td>${data.date}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          `;
-          postContent.innerHTML = html;
-        })
-        .catch(error => {
-          console.error('게시물 내용을 가져오는 중 오류 발생:', error);
-        });
-    </script>
   </body>
 </html>

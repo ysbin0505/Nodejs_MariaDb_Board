@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="UTF-8">
     <title>20193072 유승빈 DBMS_Webpage 게시판</title>
     <div class="img-holder">
       <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5muKTTN9S02W78yYT6vugq8w6WLbNFbjw4g&usqp=CAU" alt="">
     </div>
     <style>
-      body {
+    body {
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 20px;
@@ -99,120 +99,120 @@
         margin-top: 20px;
       }
     </style>
-  </head>
-  <body>
+</head>
+<body> 
     <h1>*게시판*</h1>
     <table>
-      <thead>
-        <tr>
-          <th>번호</th>
-          <th>제목</th>
-          <th>작성자</th>
-          <th>날짜</th>
-        </tr>
-      </thead>
-      <tbody id="post-table">
-        <!-- 동적으로 생성된 테이블 행 -->
-      </tbody>
+        <thead>
+            <tr>
+                <th>번호</th>
+                <th>제목</th>
+                <th>작성자</th>
+                <th>날짜</th>
+            </tr>
+        </thead>
+        <tbody id="post-table">
+            <!-- 동적으로 생성된 테이블 행 -->
+        </tbody>
     </table>
     <div id="pagination">
-      <button type="button" class="navyBtn" onClick="location.href='write.html'">글 쓰기</button>
+        <button type="button" class="navyBtn" onClick="location.href='write.html'">글 쓰기</button>
     </div>
     <div id="pagination2">
-      <button id="prev-button" disabled>이전</button>
-      <button id="next-button">다음</button>
+        <button id="prev-button" disabled>이전</button>
+        <button id="next-button">다음</button>
     </div>
     <h2>전체 글</h2>
     <div id="post-list"></div>
 
     <script>
-      const postTable = document.getElementById('post-table');
-
-      postTable.addEventListener('click', function (event) {
-        const target = event.target;
-        if (target.tagName === 'A') {
-          event.preventDefault();
-          const postId = target.getAttribute('data-post-id');
-          location.href = `content.html?id=${postId}`;
-        }
-      });
-
-      const pageSize = 5; // 한 페이지에 보여줄 게시글 수
-      let currentPage = 1; // 현재 페이지
-
-      function displayPosts() {
-        const start = (currentPage - 1) * pageSize; // 현재 페이지의 게시글 시작 인덱스
-        const end = start + pageSize; // 현재 페이지의 게시글 종료 인덱스
-        const displayedPosts = posts.slice(start, end); // 현재 페이지에 표시할 게시글들
-
         const postTable = document.getElementById('post-table');
-        postTable.innerHTML = ''; // 테이블 초기화
 
-        displayedPosts.forEach(post => {
-          const row = document.createElement('tr');
-          const postNumber = document.createElement('td');
-          const postTitle = document.createElement('td');
-          const postAuthor = document.createElement('td');
-          const postDate = document.createElement('td');
-          const postLink = document.createElement('a');
-
-          postNumber.textContent = post.번호;
-          postTitle.textContent = post.제목;
-          postAuthor.textContent = post.작성자;
-          postDate.textContent = post.날짜;
-
-          postLink.href = `content.html?id=${post.번호}`;
-          postLink.textContent = post.제목;
-          postLink.setAttribute('data-post-id', post.번호);
-
-          postTitle.innerHTML = '';
-          postTitle.appendChild(postLink);
-
-          row.appendChild(postNumber);
-          row.appendChild(postTitle);
-          row.appendChild(postAuthor);
-          row.appendChild(postDate);
-
-          postTable.appendChild(row);
+        postTable.addEventListener('click', function (event) {
+            const target = event.target;
+            if (target.tagName === 'A') {
+                event.preventDefault();
+                const postId = target.getAttribute('data-post-id');
+                location.href = `content.html?id=${postId}`;
+            }
         });
 
-        // 이전/다음 버튼 활성화/비활성화
-        const prevButton = document.getElementById('prev-button');
-        const nextButton = document.getElementById('next-button');
+        const pageSize = 5; // 한 페이지에 보여줄 게시글 수
+        let currentPage = 1; // 현재 페이지
 
-        if (currentPage === 1) {
-          prevButton.disabled = true;
-        } else {
-          prevButton.disabled = false;
+        function displayPosts() {
+            const start = (currentPage - 1) * pageSize; // 현재 페이지의 게시글 시작 인덱스
+            const end = start + pageSize; // 현재 페이지의 게시글 종료 인덱스
+            const displayedPosts = posts.slice(start, end); // 현재 페이지에 표시할 게시글들
+
+            const postTable = document.getElementById('post-table');
+            postTable.innerHTML = ''; // 테이블 초기화
+
+            displayedPosts.forEach(post => {
+                const row = document.createElement('tr');
+                const postNumber = document.createElement('td');
+                const postTitle = document.createElement('td');
+                const postAuthor = document.createElement('td');
+                const postDate = document.createElement('td');
+                const postLink = document.createElement('a');
+
+                postNumber.textContent = post.번호;
+                postTitle.textContent = post.제목;
+                postAuthor.textContent = post.작성자;
+                postDate.textContent = post.날짜;
+
+                postLink.href = `content.html?id=${post.번호}`;
+                postLink.textContent = post.제목;
+                postLink.setAttribute('data-post-id', post.번호);
+
+                postTitle.innerHTML = '';
+                postTitle.appendChild(postLink);
+
+                row.appendChild(postNumber);
+                row.appendChild(postTitle);
+                row.appendChild(postAuthor);
+                row.appendChild(postDate);
+
+                postTable.appendChild(row);
+            });
+
+            // 이전/다음 버튼 활성화/비활성화
+            const prevButton = document.getElementById('prev-button');
+            const nextButton = document.getElementById('next-button');
+
+            if (currentPage === 1) {
+                prevButton.disabled = true;
+            } else {
+                prevButton.disabled = false;
+            }
+
+            if (end >= posts.length) {
+                nextButton.disabled = true;
+            } else {
+                nextButton.disabled = false;
+            }
         }
 
-        if (end >= posts.length) {
-          nextButton.disabled = true;
-        } else {
-          nextButton.disabled = false;
+        function goToPreviousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayPosts();
+            }
         }
-      }
 
-      function goToPreviousPage() {
-        if (currentPage > 1) {
-          currentPage--;
-          displayPosts();
+        function goToNextPage() {
+            const totalPages = Math.ceil(posts.length / pageSize);
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayPosts();
+            }
         }
-      }
 
-      function goToNextPage() {
-        const totalPages = Math.ceil(posts.length / pageSize);
-        if (currentPage < totalPages) {
-          currentPage++;
-          displayPosts();
-        }
-      }
+        document.getElementById('prev-button').addEventListener('click', goToPreviousPage);
+        document.getElementById('next-button').addEventListener('click', goToNextPage);
 
-      document.getElementById('prev-button').addEventListener('click', goToPreviousPage);
-      document.getElementById('next-button').addEventListener('click', goToNextPage);
-
-      // 페이지 로드 시 게시글 표시
-      displayPosts();
+        // 페이지 로드 시 게시글 표시
+        displayPosts();
     </script>
-  </body>
+</body>
 </html>
