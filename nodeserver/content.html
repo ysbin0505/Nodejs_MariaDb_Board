@@ -89,7 +89,7 @@
     <script>
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
-      const postId = urlParams.get('id');
+      const postId = urlParams.get('postId');
       const postContent = document.getElementById('post-content');
 
       fetch(`/posts/${postId}`)

@@ -31,7 +31,7 @@ app.post('/add', async (req, res) => {
   const writer = req.body.writer;
 
   let conn;
-  try { //작성한 내용 db로 삽입
+  try {
     conn = await pool.getConnection();
     await conn.query('USE nodejs_test');
     await conn.query('INSERT INTO tbl_board (title, content, writer) VALUES (?, ?, ?)', [title, content, writer]);
@@ -47,12 +47,12 @@ app.get('/', (req, res) => {
   res.redirect('/index.html'); // index.html로 리디렉션
 });
 
-app.get('/index.html', async (req, res) => {  //db내용 index.html로 삽입
+app.get('/index.html', async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
     await conn.query('USE nodejs_test');
-    const results = await conn.query('SELECT num, title, writer, date FROM tbl_board');
+    const results = await conn.query('SELECT num, title, content, writer, date FROM tbl_board');
     const html = renderIndexPage(results);
     res.send(html);
   } catch (err) {
@@ -62,7 +62,44 @@ app.get('/index.html', async (req, res) => {  //db내용 index.html로 삽입
   }
 });
 
-function renderIndexPage(posts) {   //index.html
+app.get('/content', async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    await conn.query('USE nodejs_test');
+    const results = await conn.query('SELECT num, title, writer, date FROM tbl_board');
+    const html = renderIndexPage2(results);
+    res.send(html);
+  } catch (err) {
+    res.status(500).send('내부 서버 오류');
+  } finally {
+    if (conn) conn.end();
+  }
+});
+
+// 새로 추가된 라우트 핸들러 시작
+app.get('/posts/:postId', async (req, res) => {
+  const postId = req.params.postId;
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    await conn.query('USE nodejs_test');
+    const results = await conn.query('SELECT num, title, content, writer, date FROM tbl_board WHERE num = ?', [postId]);
+    if (results.length === 0) {
+      res.status(404).send('게시물을 찾을 수 없습니다.');
+    } else {
+      const post = results[0];
+      res.json(post);
+    }
+  } catch (err) {
+    res.status(500).send('내부 서버 오류');
+  } finally {
+    if (conn) conn.end();
+  }
+});
+// 새로 추가된 라우트 핸들러 끝
+
+function renderIndexPage(posts) {
   let tableRows = '';
   posts.forEach(post => {
     tableRows += `
@@ -79,7 +116,7 @@ function renderIndexPage(posts) {   //index.html
   return html.replace('<!-- 동적으로 생성된 테이블 행 -->', tableRows);
 }
 
-function renderIndexPage2(posts) {    //content.html
+function renderIndexPage2(posts) {
   let tableRows = '';
   posts.forEach(post => {
     tableRows += `
@@ -96,17 +133,6 @@ function renderIndexPage2(posts) {    //content.html
   const html = fs.readFileSync(path.join(__dirname, 'content.html'), 'utf8');
   return html.replace('<!-- 동적으로 생성된 테이블 행 -->', tableRows);
 }
-
-app.get('/index.html', (req, res) => {
-  const filePath = path.join(__dirname, 'index.html');
-  fs.readFile(filePath, 'utf8', function (err, data) {
-    if (err) {
-      res.status(500).send('Internal Server Error');
-      return;
-    }
-    res.send(data);
-  });
-});
 
 pool.getConnection()
   .then(conn => {
