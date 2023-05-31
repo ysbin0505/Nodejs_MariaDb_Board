@@ -21,9 +21,67 @@
     <button type="button" class="navyBtn" onclick="location.href = '/index.html'">돌아가기</button>
     <button type="button" class="navyBtn" onclick="deletePost()">삭제</button>
   </div>
-
+  <h2>댓글</h2>
+  <div id="comment-container">
+    <form id="comment-form">
+      <div>
+        <label for="comment-writer">작성자:</label>
+        <input type="text" id="comment-writer" required>
+      </div>
+      <div>
+        <label for="comment-content">댓글 내용:</label>
+        <textarea id="comment-content" required></textarea>
+      </div>
+      <button type="submit" onclick="submitComment()">등록</button>
+    </form>
+    <table id="comment-table">
+      <tbody id="comment-list"></tbody>
+    </table>    
+  </div>
   <script>
     const postId = new URLSearchParams(window.location.search).get('id');
+    const commentForm = document.getElementById('comment-form');
+    const commentWriterInput = document.getElementById('comment-writer');
+    const commentContentInput = document.getElementById('comment-content');
+    const commentTableBody = document.getElementById('comment-list');
+    
+    const postId2 = getPostIdFromURL();
+    fetchComments(postId2);
+
+    commentForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      submitComment();
+    });
+
+    function getPostIdFromURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('id');
+    }
+
+
+    function fetchComments(postId2) {
+      fetch(`/comments/${postId2}`)
+        .then(response => response.json())
+        .then(data => {
+          const comments = data.comments;
+          renderComments(comments);
+        })
+        .catch(error => console.error('댓글 가져오기 오류:', error));
+    }
+
+    function renderComments(comments) {
+      commentTableBody.innerHTML = '';
+
+      comments.forEach(comment => {
+        const row = commentTableBody.insertRow();
+        const writerCell = row.insertCell();
+        const contentCell = row.insertCell();
+
+        writerCell.textContent = comment.c_writer;
+        contentCell.textContent = comment.c_content;
+      });
+    }
+    
 
     fetch(`/content/${postId}`)
       .then(response => response.json())
@@ -40,14 +98,14 @@
         // 오류 처리 로직 추가
       });
 
+
+    // 게시물 삭제 함수
     function deletePost() {
-      // 삭제 로직 구현
       fetch(`/delete/${postId}`, { method: 'DELETE' })
         .then(response => response.json())
         .then(data => {
-          // 삭제 성공 시 처리 로직
           alert('게시물이 삭제되었습니다.');
-          window.location.href = '/index.html'; // 삭제 후 목록 페이지로 이동
+          window.location.href = '/index.html';
         })
         .catch(error => {
           console.error('게시물 삭제 오류:', error);

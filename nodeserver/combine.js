@@ -34,7 +34,14 @@ app.post('/add', async (req, res) => {
   try {
     conn = await pool.getConnection();
     await conn.query('USE nodejs_test');
+
+    // 게시물 저장
     await conn.query('INSERT INTO tbl_board (title, content, writer) VALUES (?, ?, ?)', [title, content, writer]);
+
+    // 저장된 게시물의 num 가져오기
+    const result = await conn.query('SELECT num FROM tbl_board WHERE title = ? AND content = ? AND writer = ?', [title, content, writer]);
+    const postId = result[0].num;
+
     res.redirect('/index.html'); // index.html로 리디렉션
   } catch (err) {
     res.status(500).send('글 작성 중 오류가 발생했습니다.');
@@ -42,6 +49,52 @@ app.post('/add', async (req, res) => {
     if (conn) conn.end();
   }
 });
+
+app.post('/comment/:id', async (req, res) => {
+  const postId = req.params.id;
+  const commentWriter = req.body.writer;
+  const commentContent = req.body.content;
+
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    await conn.query('USE nodejs_test');
+
+    // 댓글 저장
+    await conn.query('INSERT INTO comment (c_writer, c_content, post_id) VALUES (?, ?, ?)', [commentWriter, commentContent, postId]);
+
+    res.sendStatus(200); // Success status
+    res.redirect('/index.html'); // index.html로 리디렉션
+  } catch (err) {
+    console.error('댓글 작성 중 오류:', err);
+    res.sendStatus(500); // Internal server error status
+  } finally {
+    if (conn) conn.end();
+  }
+});
+
+
+app.get('/comments/:id', async (req, res) => {
+  const postId = req.params.id;
+
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    await conn.query('USE nodejs_test');
+    const results = await conn.query('SELECT * FROM comment WHERE post_id = ?', [postId]);
+
+    res.json({ comments: results }); // JSON response with comments array
+
+  } catch (err) {
+    console.error('댓글 가져오기 오류:', err);
+    res.sendStatus(500); // Internal server error status
+  } finally {
+    if (conn) conn.end();
+  }
+});
+
+
+
 
 app.get('/', (req, res) => {
   res.redirect('/index.html'); // index.html로 리디렉션
@@ -92,70 +145,6 @@ function renderPagination(currentPage, totalPages) {
 
   return paginationHTML;
 }
-
-
-app.get('/index.html', async (req, res) => {
-  const page = parseInt(req.query.page) || 1; // 현재 페이지
-  const perPage = 10; // 페이지당 게시물 수
-
-  let conn;
-  try {
-    conn = await pool.getConnection();
-    await conn.query('USE nodejs_test');
-
-    // 전체 게시물 수 조회
-    const totalCountResult = await conn.query('SELECT COUNT(*) AS total FROM tbl_board');
-    const totalCount = totalCountResult[0].total;
-
-    // 총 페이지 수 계산
-    const totalPages = Math.ceil(totalCount / perPage);
-
-    // 현재 페이지에 해당하는 게시물 조회
-    const offset = (page - 1) * perPage;
-    const results = await conn.query('SELECT num, title, writer, date FROM tbl_board LIMIT ?, ?', [offset, perPage]);
-
-    const html = renderIndexTable(results, page, totalPages);
-    res.send(html);
-  } catch (err) {
-    console.error('내부 서버 오류:', err);
-    res.status(500).send('내부 서버 오류');
-  } finally {
-    if (conn) conn.end();
-  }
-});
-
-
-
-function renderContentPage(post) {
-  const html = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="UTF-8">
-        <title>${post.title}</title>
-        <style>
-          /* 스타일 코드 */
-        </style>
-      </head>
-      <body>
-        <h1>게시물 내용</h1>
-        <div class="post-content" id="post-content">
-          <p><strong>번호:</strong> ${post.num}</p>
-          <p><strong>제목:</strong> ${post.title}</p>
-          <p><strong>내용:</strong> ${post.content}</p>
-          <p><strong>작성자:</strong> ${post.writer}</p>
-          <p><strong>날짜:</strong> ${new Date(post.date).toLocaleDateString()}</p>
-        </div>
-
-        <div style="display: flex; justify-content: center;">
-          <button type="button" class="navyBtn" onclick="location.href = '/index.html'">돌아가기</button>
-        </div>
-      </body>
-    </html>
-  `;
-  return html;
-}
-
 
 pool.getConnection()
   .then(conn => {

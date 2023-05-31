@@ -35,8 +35,8 @@
     </div>
     <script>
       // 게시물 목록을 가져와서 테이블에 렌더링하는 함수
-      async function renderPosts() {
-        const response = await fetch(`/index.html?page=${currentPage}`);
+      async function renderPosts(page) {
+        const response = await fetch(`/index.html?page=${page}`);
         const html = await response.text();
 
         const parser = new DOMParser();
@@ -46,20 +46,20 @@
         document.getElementById('post-table').innerHTML = postTable.innerHTML;
 
         // 페이지 버튼 상태 업데이트
-        prevButton.disabled = currentPage === 1;
+        prevButton.disabled = page === 1;
         nextButton.disabled = postTable.rows.length < perPage;
       }
 
       // 이전 페이지로 이동하는 함수
       function goToPrevPage() {
         currentPage--;
-        renderPosts();
+        renderPosts(currentPage);
       }
 
       // 다음 페이지로 이동하는 함수
       function goToNextPage() {
         currentPage++;
-        renderPosts();
+        renderPosts(currentPage);
       }
 
       const prevButton = document.getElementById('prev-button');
@@ -72,7 +72,7 @@
 
       // 페이지 로딩 시 초기 게시물 목록 렌더링
       window.addEventListener('load', () => {
-        renderPosts();
+        renderPosts(currentPage);
       });
     </script>
 </html>
