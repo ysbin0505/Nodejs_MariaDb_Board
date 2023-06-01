@@ -1,199 +1,265 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>게시물 내용</title>
     <style>
-     <style>
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f2f2f2;
-    margin: 0;
-    padding: 0;
-  }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+        margin: 0;
+        padding: 0;
+      }
 
-  h1 {
-    text-align: center;
-  }
+      h1 {
+        text-align: center;
+      }
 
-  .post-content {
-    background-color: #ffffff;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
+      .post-content {
+        background-color: #ffffff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
 
-  .post-content p {
-    margin: 0;
-    padding: 5px 0;
-  }
+      .post-content p {
+        margin: 0;
+        padding: 5px 0;
+      }
 
-  .post-content strong {
-    font-weight: bold;
-  }
+      .post-content strong {
+        font-weight: bold;
+      }
 
-  .navyBtn {
-    background-color: navy;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 10px 20px;
-    margin-right: 10px;
-    cursor: pointer;
-  }
+      .navyBtn {
+        background-color: navy;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        margin-right: 10px;
+        cursor: pointer;
+      }
 
-  #comment-container {
-    background-color: #f6f2f2;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 20px;
-  }
+      #comment-container {
+        background-color: #f6f2f2;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 20px;
+      }
 
-  #comment-form div {
-    margin-bottom: 10px;
-  }
+      #comment-form div {
+        margin-bottom: 10px;
+      }
 
-  #comment-form label {
-    display: inline-block;
-    width: 100px;
-    font-weight: bold;
-  }
+      #comment-form label {
+        display: inline-block;
+        width: 100px;
+        font-weight: bold;
+      }
 
-  #comment-form input[type="text"],
-  #comment-form textarea {
-    width: 100%;
-    padding: 5px;
-  }
+      #comment-form input[type="text"],
+      #comment-form textarea {
+        width: 100%;
+        padding: 5px;
+      }
 
-  #comment-form button[type="submit"] {
-    background-color: navy;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 10px 20px;
-    cursor: pointer;
-  }
+      #comment-form button[type="submit"] {
+        background-color: navy;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        cursor: pointer;
+      }
 
-  #comment-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-  }
+      #comment-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
 
-  #comment-table td {
-    padding: 5px;
-    border-bottom: 1px solid #ccc;
-  }
-</style>
-
+      #comment-table td {
+        padding: 5px;
+        border-bottom: 1px solid #ccc;
+      }
     </style>
-</head>
-<body>
-  <h1>게시물 내용</h1>
-  <div class="post-content" id="post-content">
-    <p><strong>번호:</strong> <span id="post-num"></span></p>
-    <p><strong>제목:</strong> <span id="post-title"></span></p>
-    <p><strong>내용:</strong> <span id="post-content-text"></span></p>
-    <p><strong>작성자:</strong> <span id="post-writer"></span></p>
-    <p><strong>날짜:</strong> <span id="post-date"></span></p>
-  </div>
+  </head>
+  <body>
+    <h1>게시물 내용</h1>
+    <div class="post-content" id="post-content">
+      <p><strong>번호:</strong> <span id="post-num"></span></p>
+      <p><strong>제목:</strong> <span id="post-title"></span></p>
+      <p><strong>내용:</strong> <span id="post-content-text"></span></p>
+      <p><strong>작성자:</strong> <span id="post-writer"></span></p>
+      <p><strong>날짜:</strong> <span id="post-date"></span></p>
+    </div>
 
-  <div style="display: flex; justify-content: center;">
-    <button type="button" class="navyBtn" onclick="location.href = '/index.html'">돌아가기</button>
-    <button type="button" class="navyBtn" onclick="deletePost()">삭제</button>
-  </div>
-  <h2>댓글</h2>
-  <div id="comment-container">
-    <form id="comment-form">
-      <div>
-        <label for="comment-writer">작성자:</label>
-        <input type="text" id="comment-writer" required>
-      </div>
-      <div>
-        <label for="comment-content">댓글 내용:</label>
-        <textarea id="comment-content" required></textarea>
-      </div>
-      <button type="submit" onclick="submitComment()">등록</button>
-    </form>
-    <table id="comment-table">
-      <tbody id="comment-list"></tbody>
-    </table>    
-  </div>
-  <script>
-    const postId = new URLSearchParams(window.location.search).get('id');
-    const commentForm = document.getElementById('comment-form');
-    const commentWriterInput = document.getElementById('comment-writer');
-    const commentContentInput = document.getElementById('comment-content');
-    const commentTableBody = document.getElementById('comment-list');
-    
-    const postId2 = getPostIdFromURL();
-    fetchComments(postId2);
+    <div style="display: flex; justify-content: center">
+      <button
+        type="button"
+        class="navyBtn"
+        onclick="location.href = '/index.html'"
+      >
+        돌아가기
+      </button>
+      <button type="button" class="navyBtn" onclick="deletePost()">삭제</button>
+    </div>
+    <h2>댓글</h2>
+    <div id="comment-container">
+      <form id="comment-form">
+        <div>
+          <label for="comment-writer">작성자:</label>
+          <input type="text" id="comment-writer" required />
+        </div>
+        <div>
+          <label for="comment-content">댓글 내용:</label>
+          <textarea id="comment-content" required></textarea>
+        </div>
+        <button type="submit">등록</button>
+      </form>
+      <table id="comment-table">
+        <tbody id="comment-list"></tbody>
+      </table>
+    </div>
+    <script>
+      const postId = new URLSearchParams(window.location.search).get("id");
+      const commentForm = document.getElementById("comment-form");
+      const commentWriterInput = document.getElementById("comment-writer");
+      const commentContentInput = document.getElementById("comment-content");
+      const commentTableBody = document.getElementById("comment-list");
 
-    commentForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      submitComment();
-    });
+      const postId2 = getPostIdFromURL();
+      fetchComments(postId2);
 
-    function getPostIdFromURL() {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get('id');
-    }
-
-
-    function fetchComments(postId2) {
-      fetch(`/comments/${postId2}`)
-        .then(response => response.json())
-        .then(data => {
-          const comments = data.comments;
-          renderComments(comments);
-        })
-        .catch(error => console.error('댓글 가져오기 오류:', error));
-    }
-
-    function renderComments(comments) {
-      commentTableBody.innerHTML = '';
-
-      comments.forEach(comment => {
-        const row = commentTableBody.insertRow();
-        const writerCell = row.insertCell();
-        const contentCell = row.insertCell();
-
-        writerCell.textContent = comment.c_writer;
-        contentCell.textContent = comment.c_content;
-      });
-    }
-    
-
-    fetch(`/content/${postId}`)
-      .then(response => response.json())
-      .then(data => {
-        const post = data.post;
-        document.getElementById('post-num').textContent = post.num;
-        document.getElementById('post-title').textContent = post.title;
-        document.getElementById('post-content-text').textContent = post.content;
-        document.getElementById('post-writer').textContent = post.writer;
-        document.getElementById('post-date').textContent = new Date(post.date).toLocaleDateString();
-      })
-      .catch(error => {
-        console.error('게시물 가져오기 오류:', error);
-        // 오류 처리 로직 추가
+      commentForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        submitComment();
       });
 
+      function getPostIdFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get("id");
+      }
 
-    // 게시물 삭제 함수
-    function deletePost() {
-      fetch(`/delete/${postId}`, { method: 'DELETE' })
-        .then(response => response.json())
-        .then(data => {
-          alert('게시물이 삭제되었습니다.');
-          window.location.href = '/index.html';
+      function submitComment() {
+        // 입력한 값을 가져옴
+        const writer = document.getElementById("comment-writer").value;
+        const content = document.getElementById("comment-content").value;
+
+        // 댓글 작성 API 호출
+        const apiURL = "/contents/" + postId + "/comments";
+
+        // 댓글 작성 API 호출 코드
+        fetch(apiURL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            writer: writer,
+            content: content,
+          }),
         })
-        .catch(error => {
-          console.error('게시물 삭제 오류:', error);
+          .then(function (response) {
+            // 응답 처리
+            if (response.ok) {
+              // 성공적으로 댓글 작성됨
+              location.reload();
+            } else {
+              // 댓글 작성 실패
+              console.error("댓글 작성에 실패했습니다.");
+            }
+          })
+          .catch(function (error) {
+            console.error("댓글 작성에 실패했습니다.", error);
+          });
+      }
+
+      function fetchComments(postId2) {
+        fetch(`/contents/${postId2}/comments`)
+          .then((response) => response.json())
+          .then((data) => {
+            const comments = data;
+            renderComments(comments);
+          })
+          .catch((error) => console.error("댓글 가져오기 오류:", error));
+      }
+
+      function deleteComment(commentId) {
+        // 댓글 삭제 API 호출
+        const apiURL = "/comments/" + commentId;
+
+        // 댓글 삭제 API 호출 코드
+        fetch(apiURL, {
+          method: "DELETE",
+        })
+          .then(function (response) {
+            // 응답 처리
+            if (response.ok) {
+              // 성공적으로 댓글 삭제됨
+              location.reload();
+            } else {
+              // 댓글 삭제 실패
+              console.error("댓글 삭제에 실패했습니다.");
+            }
+          })
+          .catch(function (error) {
+            console.error("댓글 삭제에 실패했습니다.", error);
+          });
+      }
+
+      function renderComments(comments) {
+        commentTableBody.innerHTML = "";
+
+        comments.forEach((comment) => {
+          const row = commentTableBody.insertRow();
+          const writerCell = row.insertCell();
+          const contentCell = row.insertCell();
+          const writtenAtCell = row.insertCell();
+          const buttonCell = row.insertCell();
+
+          writerCell.textContent = comment.writer;
+          contentCell.textContent = comment.content;
+          writtenAtCell.textContent = new Date(
+            comment.writtenAt
+          ).toLocaleString();
+          buttonCell.innerHTML = `<button type="button" onclick="deleteComment(${comment.id})">삭제</button>`;
+        });
+      }
+
+      fetch(`/content/${postId}`)
+        .then((response) => response.json())
+        .then((data) => {
+          const post = data.post;
+          document.getElementById("post-num").textContent = post.num;
+          document.getElementById("post-title").textContent = post.title;
+          document.getElementById("post-content-text").textContent =
+            post.content;
+          document.getElementById("post-writer").textContent = post.writer;
+          document.getElementById("post-date").textContent = new Date(
+            post.date
+          ).toLocaleDateString();
+        })
+        .catch((error) => {
+          console.error("게시물 가져오기 오류:", error);
           // 오류 처리 로직 추가
         });
-    }
-  </script>
-</body>
+
+      // 게시물 삭제 함수
+      function deletePost() {
+        fetch(`/delete/${postId}`, { method: "DELETE" })
+          .then((response) => response.json())
+          .then((data) => {
+            alert("게시물이 삭제되었습니다.");
+            window.location.href = "/index.html";
+          })
+          .catch((error) => {
+            console.error("게시물 삭제 오류:", error);
+            // 오류 처리 로직 추가
+          });
+      }
+    </script>
+  </body>
 </html>

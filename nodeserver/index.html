@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>20193072 유승빈 DBMS_Webpage 게시판</title>
     <style>
-    body {
+      body {
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 20px;
@@ -50,7 +50,8 @@
         border-collapse: collapse;
       }
 
-      th, td {
+      th,
+      td {
         padding: 10px;
         text-align: left;
         border-bottom: 1px solid #ddd;
@@ -77,17 +78,19 @@
         background-color: navy;
       }
 
-      #pagination {
+      #write-layer {
         margin-top: 20px;
         display: flex;
         justify-content: center;
       }
 
-      #prev-button, #next-button {
+      #prev-button,
+      #next-button {
         margin: 0 10px;
       }
 
-      #prev-button[disabled], #next-button[disabled] {
+      #prev-button[disabled],
+      #next-button[disabled] {
         opacity: 0.5;
         cursor: not-allowed;
       }
@@ -96,73 +99,137 @@
         margin-top: 20px;
       }
     </style>
-</head>
-<body> 
+  </head>
+  <body>
     <div class="img-holder">
-      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5muKTTN9S02W78yYT6vugq8w6WLbNFbjw4g&usqp=CAU" alt="">
+      <img
+        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5muKTTN9S02W78yYT6vugq8w6WLbNFbjw4g&usqp=CAU"
+        alt=""
+      />
     </div>
     <h1>*게시판*</h1>
     <table>
-        <thead>
-            <tr>
-                <th>번호</th>
-                <th>제목</th>
-                <th>작성자</th>
-                <th>날짜</th>
-            </tr>
-        </thead>
-        <tbody id="post-table">
-            <!-- 동적으로 생성된 테이블 행 -->
-        </tbody>
+      <thead>
+        <tr>
+          <th>번호</th>
+          <th>제목</th>
+          <th>작성자</th>
+          <th>날짜</th>
+        </tr>
+      </thead>
+      <tbody id="post-table">
+        <!-- 동적으로 생성된 테이블 행 -->
+      </tbody>
     </table>
 
-    <div id="pagination">
-        <button type="button" class="navyBtn" onClick="location.href='write.html'">글 쓰기</button>
+    <div id="write-layer">
+      <button
+        type="button"
+        class="navyBtn"
+        onClick="location.href='write.html'"
+      >
+        글 쓰기
+      </button>
     </div>
-    <div id="pagination2">
-        <button id="prev-button" disabled>이전</button>
-        <button id="next-button">다음</button>
+    <div>
+      <button id="prev-button" onclick="prevPage()">이전</button>
+      <button id="next-button" onclick="nextPage()">다음</button>
     </div>
     <script>
-      // 게시물 목록을 가져와서 테이블에 렌더링하는 함수
-      async function renderPosts(page) {
-        const response = await fetch(`/index.html?page=${page}`);
-        const html = await response.text();
+      let totalCount = 0;
+      const limit = 5;
 
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const postTable = doc.getElementById('post-table');
+      function fetchContents(page, limit) {
+        // 게시글 조회 API 호출
+        const apiURL = "/contents?page=" + page + "&limit=" + limit;
 
-        document.getElementById('post-table').innerHTML = postTable.innerHTML;
+        // 게시글 조회 API 호출 코드
+        fetch(apiURL)
+          .then(function (response) {
+            // 응답 처리
+            if (response.ok) {
+              return response.json();
+            } else {
+              throw new Error("게시글 조회에 실패했습니다.");
+            }
+          })
+          .then(function (data) {
+            totalCount = data.total;
 
-        // 페이지 버튼 상태 업데이트
-        prevButton.disabled = page === 1;
-        nextButton.disabled = postTable.rows.length < perPage;
+            // 게시글 데이터 사용
+            renderTable(data.data);
+            updateButton(page);
+          })
+          .catch(function (error) {
+            console.error("게시글 조회에 실패했습니다.", error);
+          });
       }
 
-      // 이전 페이지로 이동하는 함수
-      function goToPrevPage() {
-        currentPage--;
-        renderPosts(currentPage);
+      function renderTable(data) {
+        const tbody = document.getElementById("post-table");
+
+        // 기존 테이블 삭제 후 새로운 테이블 추가
+        tbody.innerHTML = "";
+
+        // 테이블 데이터 생성
+        data.forEach(function (row) {
+          const dataRow = document.createElement("tr");
+
+          for (let key of ["num", "title", "writer", "date"]) {
+            const td = document.createElement("td");
+            td.innerHTML = ((k) =>
+              ({
+                title: `<a href="/content.html?id=${row.num}">${row[key]}</a>`,
+                date: new Date(row.date).toLocaleString(),
+              }[k] || row[key]))(key);
+            dataRow.appendChild(td);
+          }
+
+          tbody.appendChild(dataRow);
+        });
       }
 
-      // 다음 페이지로 이동하는 함수
-      function goToNextPage() {
-        currentPage++;
-        renderPosts(currentPage);
+      function nextPage() {
+        // 다음 페이지 데이터 조회
+        const page = Number(
+          document.getElementById("next-button").getAttribute("data-page")
+        );
+        fetchContents(page, limit);
       }
 
-      const prevButton = document.getElementById('prev-button');
-      const nextButton = document.getElementById('next-button');
-      let currentPage = 1;
-      const perPage = 10;
+      function prevPage() {
+        // 이전 페이지 데이터 조회
+        const page = Number(
+          document.getElementById("prev-button").getAttribute("data-page")
+        );
+        fetchContents(page, limit);
+      }
 
-      prevButton.addEventListener('click', goToPrevPage);
-      nextButton.addEventListener('click', goToNextPage);
+      function updateButton(page) {
+        // 이전, 다음 버튼 활성화 여부 설정
+        const prevButton = document.getElementById("prev-button");
+        const nextButton = document.getElementById("next-button");
+
+        if (page === 1) {
+          prevButton.disabled = true;
+        } else {
+          prevButton.disabled = false;
+        }
+
+        if (page * limit >= totalCount) {
+          nextButton.disabled = true;
+        } else {
+          nextButton.disabled = false;
+        }
+
+        prevButton.setAttribute("data-page", page - 1);
+        nextButton.setAttribute("data-page", page + 1);
+      }
 
       // 페이지 로딩 시 초기 게시물 목록 렌더링
-      window.addEventListener('load', () => {
-        renderPosts(currentPage);
+      window.addEventListener("load", () => {
+        fetchContents(1, limit);
       });
     </script>
+  </body>
 </html>
