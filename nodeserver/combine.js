@@ -28,7 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.post("/add", async (req, res) => {
-  // 게시물 정보 가져오기
+  // 게시물 정보 가져오기 
   const title = req.body.title;
   const content = req.body.content;
   const writer = req.body.writer;
@@ -295,9 +295,16 @@ app.delete("/delete/:id", async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
+
+    // 댓글 삭제
+    await conn.query("DELETE FROM comment WHERE post_id = ?", [postId]);
+
+    //게시글 삭제
     await conn.query("DELETE FROM tbl_board WHERE num = ?", [postId]);
 
-    res.json({ message: "게시물이 삭제되었습니다." });
+   
+
+    res.json({ message: "게시물과 댓글이 삭제되었습니다." });
   } catch (err) {
     console.error("게시물 삭제 오류:", err);
     res.status(500).json({ error: "게시물 삭제 중 오류가 발생했습니다." });
@@ -307,5 +314,5 @@ app.delete("/delete/:id", async (req, res) => {
 });
 
 server.listen(serverPort, () => {
-  console.log("Server 작동 중...");
+  console.log("Server 작동 중..."); 
 });
