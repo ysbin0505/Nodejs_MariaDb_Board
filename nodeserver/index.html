@@ -126,15 +126,23 @@
       <button
         type="button"
         class="navyBtn"
+        style="margin-bottom: 10px"
         onClick="location.href='write.html'"
       >
         글 쓰기
       </button>
     </div>
-    <div>
-      <button id="prev-button" onclick="prevPage()">이전</button>
-      <button id="next-button" onclick="nextPage()">다음</button>
+    <div style="display: flex; justify-content: center;">
+      <button id="prev-button" onclick="prevPage()" style="margin-bottom: 10px;">이전</button>
+      <button id="next-button" onclick="nextPage()" style="margin-bottom: 10px;">다음</button>
     </div>
+    
+    <div style="display: flex; justify-content: center;">
+      <input type="number" id="page-input" min="1" max="1000" />
+      <button onclick="goToPage()">이동</button>
+    </div>
+    
+    
     <script>
       let totalCount = 0;
       const limit = 7;
@@ -225,6 +233,20 @@
         prevButton.setAttribute("data-page", page - 1);
         nextButton.setAttribute("data-page", page + 1);
       }
+
+
+
+      function goToPage() {
+  const pageInput = document.getElementById("page-input");
+  const pageNumber = parseInt(pageInput.value);
+
+  if (pageNumber >= 1 && pageNumber <= Math.ceil(totalCount / limit)) {
+    fetchContents(pageNumber, limit);
+  } else {
+    alert("유효하지 않은 페이지 번호입니다.");
+  }
+}
+
 
       // 페이지 로딩 시 초기 게시물 목록 렌더링
       window.addEventListener("load", () => {
